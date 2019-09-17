@@ -26,7 +26,6 @@
 	.import		_check_collision
 	.export		_YellowSpr
 	.export		_BlueSpr
-	.export		_sprid
 	.export		_pad1
 	.export		_pad2
 	.export		_collision
@@ -132,8 +131,6 @@ _palette_sp:
 .segment	"BSS"
 
 .segment	"ZEROPAGE"
-_sprid:
-	.res	1,$00
 _pad1:
 	.res	1,$00
 _pad2:
@@ -157,48 +154,31 @@ _collision:
 ;
 	jsr     _oam_clear
 ;
-; sprid = 0;
+; oam_meta_spr(BoxGuy1.x, BoxGuy1.y, YellowSpr);
 ;
-	lda     #$00
-	sta     _sprid
-;
-; sprid = oam_meta_spr(BoxGuy1.x, BoxGuy1.y, sprid, YellowSpr);
-;
-	jsr     decsp3
+	jsr     decsp2
 	lda     _BoxGuy1
-	ldy     #$02
+	ldy     #$01
 	sta     (sp),y
 	lda     _BoxGuy1+1
-	dey
-	sta     (sp),y
-	lda     _sprid
 	dey
 	sta     (sp),y
 	lda     #<(_YellowSpr)
 	ldx     #>(_YellowSpr)
 	jsr     _oam_meta_spr
-	sta     _sprid
 ;
-; sprid = oam_meta_spr(BoxGuy2.x, BoxGuy2.y, sprid, BlueSpr);
+; oam_meta_spr(BoxGuy2.x, BoxGuy2.y, BlueSpr);
 ;
-	jsr     decsp3
+	jsr     decsp2
 	lda     _BoxGuy2
-	ldy     #$02
+	ldy     #$01
 	sta     (sp),y
 	lda     _BoxGuy2+1
 	dey
 	sta     (sp),y
-	lda     _sprid
-	dey
-	sta     (sp),y
 	lda     #<(_BlueSpr)
 	ldx     #>(_BlueSpr)
-	jsr     _oam_meta_spr
-	sta     _sprid
-;
-; }
-;
-	rts
+	jmp     _oam_meta_spr
 
 .endproc
 
@@ -217,7 +197,7 @@ _collision:
 ;
 	lda     _pad1
 	and     #$02
-	beq     L00B7
+	beq     L00B1
 ;
 ; BoxGuy1.x -= 1;
 ;
@@ -225,10 +205,10 @@ _collision:
 ;
 ; else if (pad1 & PAD_RIGHT){
 ;
-	jmp     L00B8
-L00B7:	lda     _pad1
+	jmp     L00B2
+L00B1:	lda     _pad1
 	and     #$01
-	beq     L00B8
+	beq     L00B2
 ;
 ; BoxGuy1.x += 1;
 ;
@@ -236,9 +216,9 @@ L00B7:	lda     _pad1
 ;
 ; if(pad1 & PAD_UP){
 ;
-L00B8:	lda     _pad1
+L00B2:	lda     _pad1
 	and     #$08
-	beq     L00B9
+	beq     L00B3
 ;
 ; BoxGuy1.y -= 1;
 ;
@@ -246,10 +226,10 @@ L00B8:	lda     _pad1
 ;
 ; else if (pad1 & PAD_DOWN){
 ;
-	jmp     L00BA
-L00B9:	lda     _pad1
+	jmp     L00B4
+L00B3:	lda     _pad1
 	and     #$04
-	beq     L00BA
+	beq     L00B4
 ;
 ; BoxGuy1.y += 1;
 ;
@@ -257,9 +237,9 @@ L00B9:	lda     _pad1
 ;
 ; if(pad2 & PAD_LEFT){
 ;
-L00BA:	lda     _pad2
+L00B4:	lda     _pad2
 	and     #$02
-	beq     L00BB
+	beq     L00B5
 ;
 ; BoxGuy2.x -= 1;
 ;
@@ -267,10 +247,10 @@ L00BA:	lda     _pad2
 ;
 ; else if (pad2 & PAD_RIGHT){
 ;
-	jmp     L00BC
-L00BB:	lda     _pad2
+	jmp     L00B6
+L00B5:	lda     _pad2
 	and     #$01
-	beq     L00BC
+	beq     L00B6
 ;
 ; BoxGuy2.x += 1;
 ;
@@ -278,9 +258,9 @@ L00BB:	lda     _pad2
 ;
 ; if(pad2 & PAD_UP){
 ;
-L00BC:	lda     _pad2
+L00B6:	lda     _pad2
 	and     #$08
-	beq     L00BD
+	beq     L00B7
 ;
 ; BoxGuy2.y -= 1;
 ;
@@ -289,9 +269,9 @@ L00BC:	lda     _pad2
 ; else if (pad2 & PAD_DOWN){
 ;
 	rts
-L00BD:	lda     _pad2
+L00B7:	lda     _pad2
 	and     #$04
-	beq     L00A1
+	beq     L009B
 ;
 ; BoxGuy2.y += 1;
 ;
@@ -299,7 +279,7 @@ L00BD:	lda     _pad2
 ;
 ; } 
 ;
-L00A1:	rts
+L009B:	rts
 
 .endproc
 
@@ -327,7 +307,7 @@ L00A1:	rts
 ; if (collision){
 ;
 	lda     _collision
-	beq     L00BE
+	beq     L00B8
 ;
 ; pal_col(0,0x30); 
 ;
@@ -338,7 +318,7 @@ L00A1:	rts
 ;
 ; pal_col(0,0x00);
 ;
-L00BE:	jsr     pusha
+L00B8:	jsr     pusha
 	jmp     _pal_col
 
 .endproc

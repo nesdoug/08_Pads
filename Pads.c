@@ -16,7 +16,6 @@
 #pragma bss-name(push, "ZEROPAGE")
 
 // GLOBAL VARIABLES
-unsigned char sprid; // remember the index into the sprite buffer
 unsigned char pad1;
 unsigned char pad2;
 unsigned char collision;
@@ -111,14 +110,11 @@ void main (void) {
 void draw_sprites(void){
 	// clear all sprites from sprite buffer
 	oam_clear();
-
-	// reset index into the sprite buffer
-	sprid = 0;
 	
 	// draw 2 metasprites
-	sprid = oam_meta_spr(BoxGuy1.x, BoxGuy1.y, sprid, YellowSpr);
+	oam_meta_spr(BoxGuy1.x, BoxGuy1.y, YellowSpr);
 	
-	sprid = oam_meta_spr(BoxGuy2.x, BoxGuy2.y, sprid, BlueSpr);
+	oam_meta_spr(BoxGuy2.x, BoxGuy2.y, BlueSpr);
 }
 	
 	
